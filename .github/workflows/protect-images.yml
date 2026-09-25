@@ -1,0 +1,41 @@
+name: Image Guard
+
+# Self-healing: on EVERY push to main (by anyone - you, Arena platform, etc.),
+# this checks public/images. If any of the 23 site images are missing,
+# it restores them from the image-backup branch and commits automatically.
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  guard:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Check and restore images
+        run: |
+          set -e
+          COUNT=$(find public/images -type f 2>/dev/null | wc -l)
+          echo "Current images: $COUNT / 23"
+          if [ "$COUNT" -ge 23 ]; then
+            echo "All images present - nothing to do."
+            exit 0
+          fi
+          echo "Images missing - restoring from image-backup branch..."
+          git config user.name "image-guard"
+          git config user.email "image-guard@users.noreply.github.com"
+          git fetch origin image-backup
+          mkdir -p public/images
+          git restore --source=origin/image-backup -- public/images
+          NEW=$(find public/images -type f | wc -l)
+          echo "Restored images: $NEW / 23"
+          git add public/images
+          git commit -m "Auto-restore site images (image-guard)"
+          git push origin main

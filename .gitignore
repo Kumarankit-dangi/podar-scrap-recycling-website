@@ -1,0 +1,24 @@
+# Dependencies
+node_modules
+
+# Logs
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Editor
+.vscode/*
+!.vscode/extensions.json
+.idea
+.DS_Store
+
+# Local env
+.env
+.env.local
+.env.*.local
+
+# Note: dist/ IS committed on purpose — it's a single self-contained index.html
+# so the site works on any static host (including GitHub Pages "deploy from branch").
+.gh-device-code
+deploy_key
+deploy_key.pub
